@@ -1,4 +1,6 @@
 ﻿using Core.Entities;
+using Perguntados.Controllers;
+using Perguntados.Helpers;
 using System.Text.Json;
 
 namespace Perguntados
@@ -8,7 +10,8 @@ namespace Perguntados
         private static readonly string _filename = "C:\\Projetos\\Treinamento\\Perguntados\\Perguntados\\Data\\banco.json";
         private static readonly JsonSerializerOptions _options = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            //PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
             WriteIndented = true,
         };
 
@@ -19,8 +22,16 @@ namespace Perguntados
                 var escolha = MenuUsuario();
                 if (escolha == 4)
                     return;
-                switch (escolha) {
-                    case 1: ListaPerguntas();
+                switch (escolha)
+                {
+                    case 1:
+                        ListaPerguntas();
+                        break;
+                    case 2:
+                        InserirPergunta();
+                        break;
+                    case 3:
+                        DeletarPergunta();
                         break;
                 }
                 
@@ -29,9 +40,71 @@ namespace Perguntados
             
         }
 
+        private static void DeletarPergunta()
+        {
+            Console.WriteLine("Informe a pergunta que vc deseja escluir");
+            Console.Write("Informe o ID: ");
+            int idQuestao = Convert.ToInt32(Console.ReadLine());
+            General general = new General();
+            string retorno = general.ExcluiPergunta(idQuestao);
+
+            if (!string.IsNullOrEmpty(retorno))
+            {
+                Console.WriteLine($"Ocorreu um erro na exclusão: {retorno}");
+            }
+            Console.WriteLine("----- Pergunta Excluida com sucesso -----");
+        }
+
+        private static void InserirPergunta()
+        {
+            Pergunta pergunta = new Pergunta();
+
+            Console.WriteLine("Informe os dados solicitados");
+            Console.Write("Numero da Questao: ");
+            pergunta.Id = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Descrição da Questao: ");
+            pergunta.Questao = Console.ReadLine();
+            Console.WriteLine("Informe as alternativa da questão");
+            int contador = 1;
+            string? resp = "S";
+            pergunta.Respostas = new List<Resposta>();
+            do
+            {
+                pergunta.Respostas.Add(InsereRespostas(contador));
+                contador++;
+                Console.Write("Continua (S/N) ?");
+                resp = Console.ReadLine();
+            } 
+            while (!resp.ToUpper().Equals("N"));
+
+            General general = new General();
+            string retorno = general.InserePergunta(pergunta);
+            
+            if (!string.IsNullOrEmpty(retorno)){
+                Console.WriteLine($"Ocorreu um erro na gravação: {retorno}");
+            }
+            Console.WriteLine("----- Dados gravados com sucesso -----");
+
+        }
+
+        private static Resposta InsereRespostas(int id)
+        {
+            Resposta resposta = new Resposta();
+            resposta.Id = id;
+            Console.Write($"Resposta {id}: ");
+            resposta.Resp = Console.ReadLine();
+            return resposta;
+        }
+
         static void ListaPerguntas()
         {
-            List<Pergunta>? perguntas = JsonSerializer.Deserialize<List<Pergunta>>(Helpers.Helper.GetJSON(_filename), _options);
+            //List<Pergunta>? perguntas = JsonSerializer.Deserialize<List<Pergunta>>(Helper.GetJSON(_filename), new JsonSerializerOptions
+            //{
+            //    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            //    WriteIndented = true,
+            //});
+            var jsonInput = Helper.GetJSON(_filename);
+            List<Pergunta> perguntas = JsonSerializer.Deserialize<List<Pergunta>>(jsonInput, _options);
 
             if (perguntas.Any())
             {
