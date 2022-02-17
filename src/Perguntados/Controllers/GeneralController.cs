@@ -4,14 +4,13 @@ using System.Text.Json;
 
 namespace Perguntados.Controllers
 {
-    public class General
+    public class GeneralController
     {
         public void InserePergunta(Pergunta pergunta)
         {
             string dataBase = Helper.GetJSON();
             var perguntas = JsonSerializer.Deserialize<List<Pergunta>>(dataBase, new JsonSerializerOptions
             {
-                //PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true,
             });
@@ -31,7 +30,6 @@ namespace Perguntados.Controllers
             string dataBase = Helper.GetJSON();
             var perguntas = JsonSerializer.Deserialize<List<Pergunta>>(dataBase, new JsonSerializerOptions
             {
-                //PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true,
             });

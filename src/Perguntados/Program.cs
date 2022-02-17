@@ -9,6 +9,11 @@ namespace Perguntados
     {
         static void Main(string[] args)
         {
+            SelecionarOpcao();
+        }
+
+        private static void SelecionarOpcao()
+        {
             int escolha = 0;
 
             do
@@ -20,14 +25,21 @@ namespace Perguntados
                     case 1:
                         ListaPerguntas();
                         break;
+
                     case 2:
                         InserirPergunta();
                         break;
+
                     case 3:
                         DeletarPergunta();
                         break;
+
                     case 4:
                         Sair();
+                        break;
+
+                    default:
+                        Console.WriteLine("Opção nao cadastrada no sistema");
                         break;
                 }
             } while (escolha != 4);
@@ -44,19 +56,28 @@ namespace Perguntados
             Console.Write("Informe o ID: ");
 
             int idQuestao = Convert.ToInt32(Console.ReadLine());
-            General general = new General();
+            GeneralController generalController = new GeneralController();
 
-            general.ExcluiPergunta(idQuestao);
+            generalController.ExcluiPergunta(idQuestao);
 
             Console.WriteLine("----- Pergunta Excluida com sucesso -----");
         }
 
         private static void InserirPergunta()
         {
-            Console.WriteLine("Informe os dados solicitados");
-            Console.Write("Numero da Questao: ");
+            Console.Clear();
 
-            int pertuntaId = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Informe os dados solicitados");
+
+            int perguntaId = 0;
+            bool result = false;
+
+            do
+            {
+                Console.Write("Numero da Questao: ");
+                result = Int32.TryParse(Console.ReadLine(), out perguntaId);
+
+            } while (result == false);
 
             Console.Write("Descrição da Questao: ");
 
@@ -64,7 +85,7 @@ namespace Perguntados
 
             Console.WriteLine("Informe as alternativa da questão");
             int contador = 1;
-            string resp = "S";
+            string? resp = "S";
 
             var respostas = new List<Resposta>();
 
@@ -79,12 +100,12 @@ namespace Perguntados
             while (!resp.ToUpper().Equals("N"));
 
             Pergunta pergunta = new(
-                id: pertuntaId,
+                id: perguntaId,
                 questao: questao,
                 respostas: respostas);
 
-            General general = new General();
-            general.InserePergunta(pergunta);
+            GeneralController generalController = new GeneralController();
+            generalController.InserePergunta(pergunta);
 
             Console.WriteLine("----- Dados gravados com sucesso -----");
         }
@@ -102,12 +123,11 @@ namespace Perguntados
             return resposta;
         }
 
-        static void ListaPerguntas()
+        private static void ListaPerguntas()
         {
             var jsonInput = Helper.GetJSON();
             var perguntas = JsonSerializer.Deserialize<List<Pergunta>>(jsonInput, new JsonSerializerOptions
             {
-                //PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true
             });
@@ -135,7 +155,7 @@ namespace Perguntados
                 Console.WriteLine("2 - Inserir nova pergunta");
                 Console.WriteLine("3 - Excluir uma pergunta");
                 Console.WriteLine("4 - Sair");
-                Console.Write("Digite sua opção: ");                
+                Console.Write("Digite sua opção: ");
 
                 if (Int32.TryParse(Console.ReadLine(), out int value))
                 {
