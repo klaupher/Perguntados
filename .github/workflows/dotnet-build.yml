@@ -2,9 +2,9 @@ name: .NET
 
 on:
   push:
-    branches: [ master ]
+    branches: [ update-v1 ]
   pull_request:
-    branches: [ master ]
+    branches: [ update-v1 ]
 
 defaults:
   run:
